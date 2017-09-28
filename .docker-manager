@@ -1,0 +1,70 @@
+containerDefaults:
+  dns: 172.17.0.1
+  restart: always
+  swappiness: 0
+
+
+container:
+
+  jenkins:
+    maxContainers: 1
+    image: registry-0:5000/net-sec/jenkins:latest
+    volumes:
+      - source: /home/claudio/docker/jenkins
+        target: /var/jenkins_home
+        uid: 1000
+    expose:
+      - 8080
+    nginx:
+      backendPort: 8080
+
+  redmine:
+    maxContainers: 1
+    image: redmine:latest
+    volumes:
+      - source: /home/claudio/docker/redmine/files
+        target: /usr/src/redmine/files
+        uid: 999
+      - source: /home/claudio/docker/redmine/sqlite
+        target: /usr/src/redmine/sqlite
+        uid: 999
+      - source: /home/claudio/docker/redmine/themes
+        target: /usr/src/redmine/public/themes
+        uid: 999
+    expose:
+      - 3000
+    nginx:
+      backendPort: 3000
+
+  registry:
+    maxContainers: 1
+    image: registry:latest
+    volumes:
+      - source: /home/claudio/docker/registry/data
+        target: /var/lib/registry
+    expose:
+      - 5000
+    nginx:
+      backendPort: 5000
+
+  reprepro:
+    maxContainers: 1
+    image: registry-0:5000/net-sec/reprepro:latest
+    volumes:
+      - source: /home/claudio/docker/reprepro/.ssh
+        target: /home/reprepro/.ssh
+        uid: 1000
+      - source: /home/claudio/docker/reprepro/.gnupg
+        target: /home/reprepro/.gnupg
+        uid: 1000
+      - source: /home/claudio/docker/reprepro/repositories
+        target: /var/repositories
+        uid: 1000
+      - source: /home/claudio/docker/reprepro/bin
+        target: /usr/local/bin
+        uid: 0
+      - source: /home/claudio/docker/reprepro/nginx
+        target: /etc/nginx/sites-enabled
+        uid: 0
+    expose:
+      - 22
